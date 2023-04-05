@@ -20,7 +20,7 @@ public class LoginCheckFilter implements Filter {
     private static final String[] whiteList = {"/", "/members/add", "/login", "/logout", "/css/*"};
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String requestURI = httpRequest.getRequestURI();
@@ -41,8 +41,12 @@ public class LoginCheckFilter implements Filter {
                     return;
                 }
             }
-        } catch (Exception e) {
 
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            throw e; //예외 로깅 가능하지만, 톰캣까지 예외를 보내주어야 함
+        } finally {
+            log.info("인증 체크 필터 종료 {}", requestURI);
         }
     }
 
